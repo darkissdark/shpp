@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shpp level 1.2</title>
+    <style>
+      textarea {
+        vertical-align: bottom;
+      }
+      .black-square {
+        width: 100px;
+        height: 100px;
+        background-color: black;
+        margin: 10px 0 0;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .yellow-square {
+        width: 100px;
+        height: 100px;
+        background-color: yellow;
+        margin: 10px;
+      }
+
+      .red-square {
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        margin: 10px;
+        display: none;
+      }
+
+      .green-rectangle {
+        width: 50px;
+        height: 20px;
+        background-color: green;
+        margin: 10px;
+        display: none;
+      }
+
+      .coordinates {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid black;
+      }
+
+      .editable-block {
+        width: 200px;
+        height: 100px;
+        border: 1px solid black;
+        margin: 0 0 10px;
+        padding: 5px;
+      }
+
+      .editable-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(128, 128, 128, 0.5);
+        display: none;
+      }
+
+      .file-input-container {
+        width: 300px;
+        height: 200px;
+        border: 2px dashed #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .file-input-container.drag-over {
+        border-color: #000;
+        background-color: #f0f0f0;
+      }
+
+      .file-input-container.has-file {
+        border-color: #4caf50;
+        background-color: #e8f5e9;
+      }
+
+      .scroll-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: none;
+        padding: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .outer-block {
+        width: 200px;
+        height: 200px;
+        background-color: blue;
+        padding: 20px;
+      }
+
+      .inner-block {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+      }
+
+      .task-selector {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+
+      .task {
+        display: none;
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+
+      .task.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="task-selector">
+      <select id="taskSelector" onchange="showTask()">
+        <option value="task1">Task 1: Hide Methods</option>
+        <option value="task2">Task 2: Toggle Visibility</option>
+        <option value="task3">Task 3: Multiple Squares</option>
+        <option value="task4">Task 4: Selector Input</option>
+        <option value="task5">Task 5: Yellow Square</option>
+        <option value="task6">Task 6: Red Square on Hover</option>
+        <option value="task7">Task 7: Green Rectangle on Focus</option>
+        <option value="task8">Task 8: Image from URL</option>
+        <option value="task9">Task 9: Multiple Images</option>
+        <option value="task10-12">Task 10-12: Coordinates and Location</option>
+        <option value="task13">Task 13: Editable Blocks</option>
+        <option value="task14">Task 14: Scroll to Top</option>
+        <option value="task15">Task 15: Nested Blocks</option>
+        <option value="task16">Task 16: Overlay</option>
+        <option value="task17">Task 17: Form Submit Prevention</option>
+        <option value="task18" selected>Task 18: File Input</option>
+      </select>
+    </div>
+
+    <div class="task" id="task1">
+      <button onclick="hideWithCSS()">Hide with CSS</button>
+      <button onclick="hideWithJS()">Hide with JS</button>
+      <button onclick="hideWithCSSJS()">Hide with CSS+JS</button>
+      <div id="blackSquare" class="black-square"></div>
+    </div>
+
+    <div class="task" id="task2">
+      <button onclick="toggleVisibility()">Toggle Visibility</button>
+      <div id="blackSquare2" class="black-square"></div>
+    </div>
+
+    <div class="task" id="task3">
+      <button onclick="toggleAllSquares()">Toggle All Squares</button>
+      <div class="black-square"></div>
+      <div class="black-square"></div>
+      <div class="black-square"></div>
+      <div class="black-square"></div>
+      <div class="black-square"></div>
+    </div>
+
+    <div class="task" id="task4">
+      <input
+        type="text"
+        id="selectorInput"
+        placeholder="Enter CSS selector"
+        value=".task-selector"
+      />
+      <button onclick="toggleBySelector()">Toggle by Selector</button>
+    </div>
+
+    <div class="task" id="task5">
+      <div class="yellow-square" id="yellowSquare"></div>
+    </div>
+
+    <div class="task" id="task6">
+      <button id="hoverButton">Hover me</button>
+      <div class="red-square" id="redSquare"></div>
+    </div>
+
+    <div class="task" id="task7">
+      <input type="text" id="focusInput" placeholder="Focus me" />
+      <div class="green-rectangle" id="greenRectangle"></div>
+    </div>
+
+    <div class="task" id="task8">
+      <input
+        type="text"
+        id="imageUrl"
+        placeholder="Enter image URL"
+        value="https://darkissdark.github.io/di-gi/images/team.jpg"
+      />
+      <button onclick="showImage()">Show Image</button>
+      <div id="imageContainer"></div>
+    </div>
+
+    <div class="task" id="task9">
+      <textarea
+        id="imageUrls"
+        rows="12"
+        cols="50"
+        placeholder="Enter image URLs (one per line)"
+      >
+https://darkissdark.github.io/di-gi/images/team.jpg
+https://darkissdark.github.io/di-gi/images/team.jpg
+</textarea
+      >
+      <button onclick="showMultipleImages()">Show Images</button>
+      <div id="multipleImagesContainer"></div>
+    </div>
+
+    <div class="task" id="task10-12">
+      <div class="coordinates" id="coordinates">
+        <div id="mouseCoords"></div>
+        <div id="browserLang"></div>
+        <div id="locationCoords"></div>
+      </div>
+    </div>
+
+    <div class="task" id="task13">
+      <div
+        class="editable-block"
+        id="localStorageBlock"
+        contenteditable="true"
+      ></div>
+      <div
+        class="editable-block"
+        id="cookiesBlock"
+        contenteditable="true"
+      ></div>
+      <div
+        class="editable-block"
+        id="sessionStorageBlock"
+        contenteditable="true"
+      ></div>
+    </div>
+
+    <div class="task" id="task14">
+      <div style="height: 2000px">Scroll down to see the button</div>
+      <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
+        ↑
+      </button>
+    </div>
+
+    <div class="task" id="task15">
+      <div class="outer-block" id="outerBlock">
+        <div class="inner-block" id="innerBlock"></div>
+      </div>
+    </div>
+
+    <div class="task" id="task16">
+      <button onclick="showOverlay()">Show Overlay</button>
+      <div class="overlay" id="overlay"></div>
+    </div>
+
+    <div class="task" id="task17">
+      <form id="preventSubmitForm">
+        <input type="submit" value="GO" />
+      </form>
+    </div>
+
+    <div class="task" id="task18">
+      <div class="file-input-container" id="fileInputContainer">
+        <input type="file" id="fileInput" style="display: none" />
+        <label for="fileInput"
+          >Drag and drop files here or click to select</label
+        >
+      </div>
+    </div>
+
+    <script src="/level-1-2/level-1-2.js"></script>
+  </body>
+</html>
