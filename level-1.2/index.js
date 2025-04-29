@@ -1,5 +1,23 @@
 document.addEventListener("DOMContentLoaded", function () {
   showTask();
+  const csvInput = document.getElementById("csvInput");
+  const textInput = document.getElementById("textToReplace");
+  const output = document.getElementById("csvOutput");
+
+  let replaceFn = csvToObject(csvInput.value);
+
+  function updateOutput() {
+    output.innerHTML = replaceFn(textInput.value);
+  }
+
+  csvInput.addEventListener("input", () => {
+    replaceFn = csvToObject(csvInput.value);
+    updateOutput();
+  });
+
+  textInput.addEventListener("input", updateOutput);
+
+  updateOutput();
 });
 
 function showTask() {
@@ -230,5 +248,58 @@ function updateFileInputUI() {
     fileInputContainer.classList.remove("has-file");
     fileInputContainer.querySelector("label").innerHTML =
       "Drag and drop files here or click to select";
+  }
+}
+
+// Task 19: CSV Rich Text
+function csvToObject(data) {
+  const csvInput = data
+    .split("\n")
+    .filter((row) => row.trim() !== "" && !row.startsWith("#"))
+    .map((row) => {
+      const fields = row.split(",").filter((field) => field.trim() !== "");
+      return {
+        x: fields[0],
+        y: fields[1],
+        name: fields[2],
+        population: fields[3],
+      };
+    })
+    .reduce((acc, item) => {
+      if (!acc.some((city) => city.name === item.name)) {
+        acc.push(item);
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => b.population - a.population)
+    .slice(0, 10)
+    .reduce((acc, item, index) => {
+      acc[item.name] = { population: +item.population, rank: 1 + index };
+      return acc;
+    }, {});
+
+  return function (text) {
+    let result = text;
+
+    for (const cityName in csvInput) {
+      const { population, rank } = csvInput[cityName];
+      const additionalText = `${cityName} (${rank} місце в ТОП-10 найбільших міст України, населення: ${pluralizeUkrainian(
+        population,
+        ["людина", "людини", "людей"]
+      )})`;
+      result = result.replace(cityName, additionalText);
+    }
+
+    return result;
+  };
+
+  function pluralizeUkrainian(count, [one, few, many]) {
+    let plural = many;
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+
+    if (mod10 === 1 && mod100 !== 11) plural = one;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) plural = few;
+    return `${count} ${plural}`;
   }
 }
