@@ -4,11 +4,14 @@ This repository contains the SHPP project, showcasing various levels of implemen
 
 ## Live Demo
 
-You can view the live demo of the project here: [SHPP Level 1.2 Demo](https://darkissdark.github.io/shpp/level-1.2/index.html)
+Here are the live demos for the project:
+
+- [SHPP Level 1.2 Demo](https://darkissdark.github.io/shpp/level-1.2/index.html) - Demonstrates JavaScript manipulations with the DOM.
+- [SHPP Level 1.3 Demo](https://darkissdark.github.io/shpp/level-1.3/index.html) - Showcases the creation of a sortable table using JavaScript.
 
 ## Project Structure
 
-- `level-1.2/`: Contains the implementation for levels 1.2.
+- `level-1.n/`: Contains the implementation for levels 1.n where n is number of task, starts from 2
 
 ## How to Use
 
