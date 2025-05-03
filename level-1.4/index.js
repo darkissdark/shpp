@@ -38,6 +38,8 @@ function getAge(birthday) {
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
   const dayDiff = today.getDate() - birthDate.getDate();
+  console.log(birthDate);
+  console.log(today);
 
   if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
     age--;
@@ -47,7 +49,9 @@ function getAge(birthday) {
 }
 
 function getColorLabel(color) {
-  return ntc.name(color)[1] || noDataMessage;
+  return `<span class="square" style="background: ${color}"></span> ${
+    ntc.name(color)[1] || noDataMessage
+  }`;
 }
 
 async function fetchData(apiUrl) {
