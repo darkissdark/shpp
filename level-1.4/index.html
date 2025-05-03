@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shpp level 1.4</title>
+    <style>
+      textarea {
+        vertical-align: bottom;
+      }
+
+      img {
+        max-width: 100%;
+        height: 50px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .task-selector {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+
+      .task {
+        display: none;
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+
+      .task.active {
+        display: block;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: sans-serif;
+        font-size: 16px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      #productsTable {
+        margin-top: 20px;
+      }
+
+      thead {
+        background-color: #f2f2f2;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px 14px;
+        text-align: left;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      table tbody tr:hover {
+        background-color: #eef;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="task-selector">
+      <select id="taskSelector" onchange="showTask()">
+        <option value="task1" selected>My table from backend</option>
+      </select>
+    </div>
+
+    <div class="task" id="task1">
+      <div id="usersTable"></div>
+      <div id="productsTable"></div>
+    </div>
+
+    <div class="task" id="task2"></div>
+
+    <script src="./index.js"></script>
+    <script
+      type="text/javascript"
+      src="https://chir.ag/projects/ntc/ntc.js"
+    ></script>
+  </body>
+</html>
