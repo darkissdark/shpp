@@ -11,7 +11,7 @@ const config1 = {
         `<img src="${user.avatar}" alt="${user.name} ${user.surname}"/>`,
     },
   ],
-  apiUrl: "https://mock-api.shpp.me/<nsurname>/users",
+  apiUrl: "https://mock-api.shpp.me/vmdedvid/users",
 };
 const config2 = {
   parent: "#productsTable",
@@ -23,23 +23,13 @@ const config2 = {
     },
     { title: "Колір", value: (product) => getColorLabel(product.color) }, // функцію getColorLabel вам потрібно створити
   ],
-  apiUrl: "https://mock-api.shpp.me/<nsurname>/products",
+  apiUrl: "https://mock-api.shpp.me/vmdedvid/products",
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  showTask();
   DataTable(config1);
   DataTable(config2);
 });
-
-function showTask() {
-  document.querySelectorAll(".task.active").forEach((task) => {
-    task.classList.remove("active");
-  });
-
-  const selectedTaskId = document.getElementById("taskSelector").value;
-  document.getElementById(selectedTaskId).classList.add("active");
-}
 
 function getAge(birthday) {
   const birthDate = new Date(birthday);
@@ -71,16 +61,29 @@ async function fetchData(apiUrl) {
 async function DataTable(config) {
   const { parent, columns, data, apiUrl } = config;
   let tableData = data;
+  let tableColumns = columns;
 
   if (!tableData && apiUrl) {
     try {
       const response = await fetchData(apiUrl);
-      tableData = Object.values(response.data);
+      tableData = Object.entries(response.data).map(([id, value]) => ({
+        id,
+        ...value,
+      }));
     } catch (error) {
       console.error("Error fetching data:", error);
       return;
     }
   }
+
+  tableColumns = [
+    ...tableColumns,
+    {
+      title: "Дії",
+      value: (item) =>
+        `<button class="remove" data-id="${item.id}">Видалити</button>`,
+    },
+  ];
 
   const parentElement = document.querySelector(parent);
   const table = document.createElement("table");
@@ -88,36 +91,62 @@ async function DataTable(config) {
   const tbody = document.createElement("tbody");
   const tr = document.createElement("tr");
 
-  parentElement.appendChild(table);
-  table.appendChild(thead);
-  thead.appendChild(tr);
-  table.appendChild(tbody);
-
-  columns.forEach((column) => {
+  tableColumns.forEach((column) => {
     const th = document.createElement("th");
     th.textContent = column.title;
-    th.classList.add("sortable");
-
     tr.appendChild(th);
   });
 
-  renderTableBody(tableData, tbody, columns);
+  thead.appendChild(tr);
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  parentElement.appendChild(table);
+
+  renderTableBody(tableData, tbody, tableColumns, apiUrl);
 }
 
-function renderTableBody(data, tbody, columns) {
+function renderTableBody(data, tbody, tableColumns, apiUrl) {
   data.forEach((row) => {
     const tr = document.createElement("tr");
-    columns.forEach((column) => {
+
+    tableColumns.forEach((column) => {
       const td = document.createElement("td");
       if (typeof column.value === "function") {
         td.innerHTML = column.value(row);
       } else {
-        td.textContent = row[column.value].length
+        td.textContent = row[column.value]?.length
           ? row[column.value]
           : noDataMessage;
       }
       tr.appendChild(td);
     });
+
     tbody.appendChild(tr);
   });
+
+  tbody.addEventListener("click", (event) => {
+    const target = event.target;
+    const tr = target.closest("tr");
+    if (target.tagName === "BUTTON" && target.dataset.id.length) {
+      deleteItem(target.dataset.id, tr, apiUrl);
+    }
+  });
+}
+
+function deleteItem(id, tr, apiUrl) {
+  fetch(`${apiUrl}/${id}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete item");
+      }
+      return response.json();
+    })
+    .then(() => {
+      tr.remove();
+    })
+    .catch((error) => {
+      console.error("Error deleting item:", error);
+    });
 }

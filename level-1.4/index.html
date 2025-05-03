@@ -14,26 +14,6 @@
         height: 50px;
       }
 
-      .hidden {
-        display: none;
-      }
-
-      .task-selector {
-        margin: 20px;
-        padding: 20px;
-        border: 1px solid #ccc;
-      }
-
-      .task {
-        display: none;
-        margin: 20px;
-        padding: 20px;
-        border: 1px solid #ccc;
-      }
-
-      .task.active {
-        display: block;
-      }
       table {
         width: 100%;
         border-collapse: collapse;
@@ -41,6 +21,28 @@
         font-size: 16px;
         background-color: #fff;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .remove {
+        background-color: #e63946;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .remove:hover {
+        background-color: #d62828;
+        transform: translateY(-2px);
+      }
+
+      .remove:active {
+        background-color: #b71c1c;
+        transform: translateY(0);
       }
 
       #productsTable {
@@ -68,23 +70,14 @@
     </style>
   </head>
   <body>
-    <div class="task-selector">
-      <select id="taskSelector" onchange="showTask()">
-        <option value="task1" selected>My table from backend</option>
-      </select>
-    </div>
+    <div id="usersTable"></div>
 
-    <div class="task" id="task1">
-      <div id="usersTable"></div>
-      <div id="productsTable"></div>
-    </div>
+    <div id="productsTable"></div>
 
-    <div class="task" id="task2"></div>
-
-    <script src="./index.js"></script>
     <script
       type="text/javascript"
       src="https://chir.ag/projects/ntc/ntc.js"
     ></script>
+    <script src="./index.js"></script>
   </body>
 </html>
