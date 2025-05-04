@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shpp level 1.4</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
       textarea {
         vertical-align: bottom;
       }
@@ -67,6 +70,7 @@
       table tbody tr:hover {
         background-color: #eef;
       }
+
       .square {
         width: 20px;
         height: 20px;
@@ -74,6 +78,85 @@
         display: inline-block;
         vertical-align: middle;
         margin-top: -2px;
+      }
+
+      caption {
+        text-align: left;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .add-form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 400px;
+        max-width: 90%;
+      }
+
+      .add-form label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .add-form input[type="color"] {
+        width: 100%;
+        margin-top: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .add-form input:not([type="color"]),
+      .add-form select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .add-form input.error,
+      .add-form select.error {
+        border-color: red;
+      }
+
+      .add-form button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .add-form button:hover {
+        background-color: #45a049;
+      }
+
+      .add-button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .add-button:hover {
+        background-color: #45a049;
       }
     </style>
   </head>
