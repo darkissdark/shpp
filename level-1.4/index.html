@@ -13,8 +13,10 @@
       }
 
       img {
-        max-width: 100%;
+        max-width: 50px;
         height: 50px;
+        display: block;
+        object-fit: contain;
       }
 
       table {
@@ -26,7 +28,8 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
       }
 
-      .remove {
+      .remove,
+      .edit {
         background-color: #e63946;
         color: white;
         padding: 5px 10px;
@@ -38,11 +41,23 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       }
 
+      .edit {
+        background-color: rgb(240, 230, 140);
+        color: #000;
+        margin-right: 10px;
+      }
+      .edit:hover {
+        background-color: #f1c40f;
+        transform: translateY(-2px);
+      }
       .remove:hover {
         background-color: #d62828;
         transform: translateY(-2px);
       }
-
+      .edit:active {
+        background-color: #f39c12;
+        transform: translateY(0);
+      }
       .remove:active {
         background-color: #b71c1c;
         transform: translateY(0);
@@ -97,7 +112,7 @@
         z-index: 1000;
       }
 
-      .add-form {
+      .modal-form {
         background-color: white;
         padding: 20px;
         border-radius: 8px;
@@ -105,20 +120,20 @@
         max-width: 90%;
       }
 
-      .add-form label {
+      .modal-form label {
         display: block;
         margin-bottom: 10px;
       }
 
-      .add-form input[type="color"] {
+      .modal-form input[type="color"] {
         width: 100%;
         margin-top: 4px;
         border: 1px solid #ccc;
         border-radius: 4px;
         cursor: pointer;
       }
-      .add-form input:not([type="color"]),
-      .add-form select {
+      .modal-form input:not([type="color"]),
+      .modal-form select {
         width: 100%;
         padding: 8px;
         margin-top: 4px;
@@ -126,12 +141,12 @@
         border-radius: 4px;
       }
 
-      .add-form input.error,
-      .add-form select.error {
+      .modal-form input.error,
+      .modal-form select.error {
         border-color: red;
       }
 
-      .add-form button {
+      .modal-form button {
         background-color: #4caf50;
         color: white;
         padding: 10px 15px;
@@ -141,7 +156,7 @@
         margin-top: 10px;
       }
 
-      .add-form button:hover {
+      .modal-form button:hover {
         background-color: #45a049;
       }
 

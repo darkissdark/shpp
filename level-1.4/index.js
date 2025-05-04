@@ -70,34 +70,32 @@ function getAge(birthday) {
   const birthDate = new Date(birthday);
   const today = new Date();
 
+  if (birthDate > today) return noDataMessage;
+
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
   const dayDiff = today.getDate() - birthDate.getDate();
 
-  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-    age--;
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
 
   if (age < 1) {
-    if (monthDiff < 1 && dayDiff < 1) return noDataMessage;
-
-    const unit =
-      monthDiff < 1 ? ["день", "дні", "днів"] : ["місяць", "місяці", "місяців"];
-    const value = monthDiff < 1 ? dayDiff : monthDiff;
-    return pluralizeUkrainian(value, unit);
+    const daysDiff = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+    if (daysDiff < 30)
+      return pluralizeUkrainian(daysDiff, ["день", "дні", "днів"]);
+    const monthsDiff = Math.floor(daysDiff / 30);
+    return pluralizeUkrainian(monthsDiff, ["місяць", "місяці", "місяців"]);
   }
 
   return pluralizeUkrainian(age, ["рік", "роки", "років"]);
 }
 
 function pluralizeUkrainian(count, [one, few, many]) {
-  let plural = many;
   const mod10 = count % 10;
   const mod100 = count % 100;
-
-  if (mod10 === 1 && mod100 !== 11) plural = one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) plural = few;
-  return `${count} ${plural}`;
+  if (mod10 === 1 && mod100 !== 11) return `${count} ${one}`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+    return `${count} ${few}`;
+  return `${count} ${many}`;
 }
 
 function getColorLabel(color) {
@@ -108,20 +106,16 @@ function getColorLabel(color) {
 
 async function fetchData(apiUrl) {
   const response = await fetch(apiUrl);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
+  if (!response.ok) throw new Error("Network response was not ok");
   return response.json();
 }
 
 async function DataTable(config) {
-  const { parent, columns, apiUrl, data } = config;
-  let tableData = data;
-
-  if (!tableData && apiUrl) {
+  const { parent, columns, apiUrl } = config;
+  if (!config.data && apiUrl) {
     try {
       const response = await fetchData(apiUrl);
-      tableData = Object.entries(response.data).map(([id, value]) => ({
+      config.data = Object.entries(response.data).map(([id, value]) => ({
         id,
         ...value,
       }));
@@ -134,8 +128,28 @@ async function DataTable(config) {
   const parentElement = document.querySelector(parent);
   const { table, tbody, addButton } = createTableElement(columns);
 
-  addButton.addEventListener("click", () => showAddForm(config, columns));
-  renderTableBody(tableData, tbody, columns, apiUrl);
+  addButton.addEventListener("click", () => showForm({ mode: "add", config }));
+
+  tbody.addEventListener("click", (e) => {
+    const button = e.target.closest("button");
+    if (!button) return;
+
+    const id = button.dataset.id;
+    const row = config.data?.find((item) => item.id === id);
+
+    if (!row) {
+      console.warn("Row not found for id:", id);
+      return;
+    }
+
+    if (button.classList.contains("remove")) {
+      deleteItem(id, button.closest("tr"), config.apiUrl);
+    } else if (button.classList.contains("edit")) {
+      showForm({ mode: "edit", config, row });
+    }
+  });
+
+  renderTableBody(config.data, tbody, columns, config);
 
   parentElement.innerHTML = "";
   parentElement.appendChild(table);
@@ -152,19 +166,19 @@ function createTableElement(columns) {
   table.appendChild(caption);
 
   const thead = document.createElement("thead");
-  const tr = document.createElement("tr");
+  const headerRow = document.createElement("tr");
 
   columns.forEach((col) => {
     const th = document.createElement("th");
     th.textContent = col.title;
-    tr.appendChild(th);
+    headerRow.appendChild(th);
   });
 
   const thActions = document.createElement("th");
   thActions.textContent = "Дії";
-  tr.appendChild(thActions);
+  headerRow.appendChild(thActions);
 
-  thead.appendChild(tr);
+  thead.appendChild(headerRow);
   const tbody = document.createElement("tbody");
   table.appendChild(thead);
   table.appendChild(tbody);
@@ -172,120 +186,114 @@ function createTableElement(columns) {
   return { table, tbody, addButton };
 }
 
-function renderTableBody(data, tbody, columns, apiUrl) {
+function renderTableBody(data, tbody, columns, config) {
   tbody.innerHTML = "";
   data.forEach((row) => {
     const tr = document.createElement("tr");
 
     columns.forEach((col) => {
       const td = document.createElement("td");
-
-      if (typeof col.value === "function") {
-        td.innerHTML = col.value(row);
-      } else {
-        const cellValue = row[col.value];
-        td.innerHTML = cellValue.length ? cellValue : noDataMessage;
-      }
-
+      const value =
+        typeof col.value === "function"
+          ? col.value(row)
+          : row[col.value] || noDataMessage;
+      td.innerHTML = value;
       tr.appendChild(td);
     });
 
-    const tdDelete = document.createElement("td");
-    const btn = document.createElement("button");
-    btn.textContent = "Видалити";
-    btn.className = "remove";
-    btn.dataset.id = row.id;
-    tdDelete.appendChild(btn);
-    tr.appendChild(tdDelete);
+    const tdActions = document.createElement("td");
 
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Редагувати";
+    editBtn.className = "edit";
+    editBtn.dataset.id = row.id;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Видалити";
+    removeBtn.className = "remove";
+    removeBtn.dataset.id = row.id;
+
+    tdActions.append(editBtn, removeBtn);
+    tr.appendChild(tdActions);
     tbody.appendChild(tr);
   });
 
-  tbody.addEventListener("click", (e) => {
-    if (
-      e.target.tagName === "BUTTON" &&
-      e.target.classList.contains("remove")
-    ) {
-      const tr = e.target.closest("tr");
-      const id = e.target.dataset.id;
-      deleteItem(id, tr, apiUrl);
-    }
+  config.data = data;
+
+  document.querySelectorAll(`table img`).forEach((img) => {
+    img.onerror = function () {
+      this.src =
+        "https://t4.ftcdn.net/jpg/00/65/77/27/240_F_65772719_A1UV5kLi5nCEWI0BNLLiFaBPEkUbv5Fv.jpg";
+    };
   });
 }
 
 function deleteItem(id, tr, apiUrl) {
-  fetch(`${apiUrl}/${id}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error("Failed to delete item");
-      return response.json();
-    })
-    .then(() => {
+  fetch(`${apiUrl}/${id}`, { method: "DELETE" })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to delete item");
       tr.remove();
     })
-    .catch((error) => {
-      console.error("Error deleting item:", error);
-    });
+    .catch((err) => console.error("Error deleting item:", err));
 }
 
-function showAddForm(config, columns) {
+function showForm({ mode, config, row = {} }) {
+  const { columns, apiUrl, parent } = config;
   const modal = document.createElement("div");
   modal.className = "modal";
 
   const form = document.createElement("form");
-  form.className = "add-form";
+  form.className = `modal-form ${mode}-form`;
   form.setAttribute("novalidate", true);
 
   columns.forEach((column) => {
-    if (column.input) {
-      const inputs = Array.isArray(column.input)
-        ? column.input
-        : [column.input];
+    const inputs = Array.isArray(column.input) ? column.input : [column.input];
+    inputs.forEach((input) => {
+      const label = document.createElement("label");
+      label.textContent = input.label || column.title;
 
-      inputs.forEach((input) => {
-        const label = document.createElement("label");
-        label.textContent = input.label || column.title;
+      if (input.type === "select") {
+        const select = document.createElement("select");
+        select.name = input.name;
+        select.required = input.required !== false;
 
-        if (input.type === "select") {
-          const select = document.createElement("select");
-          select.name = input.name;
-          select.required = input.required !== false;
+        input.options.forEach((option) => {
+          const opt = document.createElement("option");
+          opt.value = option;
+          opt.textContent = option;
+          if (row[input.name] === option) opt.selected = true;
+          select.appendChild(opt);
+        });
+        label.appendChild(select);
+      } else {
+        const inputEl = document.createElement("input");
+        inputEl.type = input.type;
+        inputEl.name = input.name || column.value;
+        inputEl.required = input.required !== false;
+        if (input.placeholder) inputEl.placeholder = input.placeholder;
 
-          input.options.forEach((option) => {
-            const optionElement = document.createElement("option");
-            optionElement.value = option;
-            optionElement.textContent = option;
-            select.appendChild(optionElement);
-          });
-
-          label.appendChild(select);
+        if (input.type === "date" && row[input.name]) {
+          inputEl.value = new Date(row[input.name]).toISOString().split("T")[0];
         } else {
-          const inputElement = document.createElement("input");
-          inputElement.type = input.type;
-          inputElement.name = input.name || column.value;
-          inputElement.required = input.required !== false;
-          if (input.placeholder) inputElement.placeholder = input.placeholder;
-
-          label.appendChild(inputElement);
+          inputEl.value = row[inputEl.name] || "";
         }
 
-        form.appendChild(label);
-      });
-    }
+        label.appendChild(inputEl);
+      }
+
+      form.appendChild(label);
+    });
   });
 
-  const submitButton = document.createElement("button");
-  submitButton.type = "submit";
-  submitButton.textContent = "Додати";
-
-  form.appendChild(submitButton);
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "submit";
+  submitBtn.textContent = mode === "add" ? "Додати" : "Зберегти";
+  form.appendChild(submitBtn);
   modal.appendChild(form);
   document.body.appendChild(modal);
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const formData = new FormData(form);
     const data = {};
     let isValid = true;
@@ -296,39 +304,40 @@ function showAddForm(config, columns) {
         isValid = false;
       } else {
         el.classList.remove("error");
-        data[el.name] = el.value;
+        data[el.name] = el.type === "number" ? parseFloat(el.value) : el.value;
       }
     });
 
     if (!isValid) return;
 
     try {
-      const response = await fetch(config.apiUrl, {
-        method: "POST",
+      const url = mode === "edit" ? `${apiUrl}/${row.id}` : apiUrl;
+      const method = mode === "edit" ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Failed to add item");
+      if (!response.ok) throw new Error("Failed to submit form");
 
-      const responseData = await fetchData(config.apiUrl);
-      const newData = Object.entries(responseData.data).map(([id, value]) => ({
+      const newDataRaw = await fetchData(apiUrl);
+      config.data = Object.entries(newDataRaw.data).map(([id, val]) => ({
         id,
-        ...value,
+        ...val,
       }));
 
-      const tbody = document.querySelector(`${config.parent} tbody`);
-      renderTableBody(newData, tbody, config.columns, config.apiUrl);
+      const tbody = document.querySelector(`${parent} tbody`);
+      renderTableBody(config.data, tbody, columns, config);
 
       modal.remove();
-    } catch (error) {
-      console.error("Error adding item:", error);
+    } catch (err) {
+      console.error("Error submitting form:", err);
     }
   });
 
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.remove();
-    }
+    if (e.target === modal) modal.remove();
   });
 }
