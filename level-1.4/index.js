@@ -220,12 +220,16 @@ function renderTableBody(data, tbody, columns, config) {
 
   config.data = data;
 
-  document.querySelectorAll(`table img`).forEach((img) => {
-    img.onerror = function () {
-      this.src =
-        "https://t4.ftcdn.net/jpg/00/65/77/27/240_F_65772719_A1UV5kLi5nCEWI0BNLLiFaBPEkUbv5Fv.jpg";
-    };
-  });
+  setTimeout(() => {
+    const images = document.querySelectorAll(`table img`);
+    images.forEach((img) => {
+      img.onerror = function () {
+        this.src =
+          "https://t4.ftcdn.net/jpg/00/65/77/27/240_F_65772719_A1UV5kLi5nCEWI0BNLLiFaBPEkUbv5Fv.jpg";
+        this.alt = "Image not found";
+      };
+    });
+  }, 0);
 }
 
 function deleteItem(id, tr, apiUrl) {
