@@ -8,6 +8,7 @@ Here are the live demos for the project:
 
 - [SHPP Level 1.2 Demo](https://darkissdark.github.io/shpp/level-1.2/index.html) - Demonstrates JavaScript manipulations with the DOM.
 - [SHPP Level 1.3 Demo](https://darkissdark.github.io/shpp/level-1.3/index.html) - Showcases the creation of a sortable table using JavaScript.
+- [SHPP Level 1.4 Demo](https://darkissdark.github.io/shpp/level-1.4/index.html) - Showcases a configurable dynamic table with add/edit forms, data loading from API, custom field rendering, and image error fallback handling using JavaScript.
 
 ## Project Structure
 
