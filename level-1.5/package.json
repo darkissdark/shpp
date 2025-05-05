@@ -1,0 +1,58 @@
+{
+  "name": "live-reload-vanilla-website-template",
+  "version": "1.0.0",
+  "description": "Template to build a website without a front-end framework. Includes transpilation of ES6+ JavaScript and Sass support",
+  "main": "main.js",
+  "author": "Esau Silva",
+  "license": "MIT",
+  "scripts": {
+    "dev:assets": "webpack --watch",
+    "dev": "live-server --open=./public/ --host=localhost --watch=./public/",
+    "build": "NODE_ENV=production webpack",
+    "prepare": "npx crlf --set=LF node_modules/.bin/live-server && husky install"
+  },
+  "lint-staged": {
+    "**/*.js": "eslint"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.0",
+    "concurrently": "^7.6.0",
+    "css-loader": "^6.7.3",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "live-server": "^1.2.2",
+    "mini-css-extract-plugin": "^2.7.2",
+    "postcss": "^8.4.20",
+    "postcss-loader": "^7.0.2",
+    "postcss-preset-env": "^7.8.0",
+    "sass": "^1.87.0",
+    "sass-loader": "^13.2.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esausilva/live-reload-vanilla-website-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/esausilva/live-reload-vanilla-website-template/issues"
+  },
+  "keywords": [
+    "JavaScript",
+    "Webpack",
+    "ES6+",
+    "live reload",
+    "Sass"
+  ],
+  "dependencies": {
+    "moment": "^2.30.1"
+  }
+}
